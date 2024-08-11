@@ -9,6 +9,7 @@ import (
 	"os"
 )
 
+// Define the EmailRequest struct
 type EmailRequest struct {
 	Name     string `json:"name"`
 	Instance string `json:"instance"`
@@ -16,6 +17,7 @@ type EmailRequest struct {
 	Message  string `json:"message"`
 }
 
+// Declare environment variable variables
 var (
 	FROM      string
 	TO        string
@@ -25,6 +27,7 @@ var (
 	APP_PORT  string
 )
 
+// Function to send an email
 func sendEmail(subject, name, instance, message string) error {
 	body := fmt.Sprintf("Name: %s\nInstance: %s\n\n%s", name, instance, message)
 
@@ -43,6 +46,7 @@ func sendEmail(subject, name, instance, message string) error {
 	return nil
 }
 
+// Handler function for sending email
 func emailHandler(w http.ResponseWriter, r *http.Request) {
 	// Handle preflight OPTIONS request
 	if r.Method == http.MethodOptions {
@@ -75,6 +79,14 @@ func emailHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Email sent successfully")
 }
 
+// Handler function for the Hello World endpoint
+func helloHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Hello, World!")
+}
+
+// Initialize environment variables
 func init() {
 	FROM = os.Getenv("FROM_EMAIL")
 	PASSWORD = os.Getenv("PASSWORD_EMAIL")
@@ -84,8 +96,11 @@ func init() {
 	APP_PORT = os.Getenv("APP_PORT")
 }
 
+// Main function to start the server
 func main() {
 	http.HandleFunc("/send-email", emailHandler)
+	http.HandleFunc("/hello", helloHandler) // Add the new Hello World endpoint
+
 	fmt.Printf("Server is running on port %s\n", APP_PORT)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", APP_PORT), nil))
 }
